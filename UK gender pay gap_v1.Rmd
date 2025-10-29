@@ -151,9 +151,7 @@ data_PQ <- payGapDataLong %>%
 
   ggplot(data = data_PQ, aes(x = payGapMeasure, y = value, colour = pre92))+
   geom_boxplot()+
-  facet_grid(rows = vars(payGapMeasure),
-            col = vars(year),
-            labeller = label_both)+
+  facet_wrap(vars(year),labeller = label_both)+
   labs(y = "% Female")
 
 unique(payGapDataLong$payGapMeasure)
@@ -175,6 +173,7 @@ payGapDataLong %>%
 # better labeling
 # order of pay quartiles
 ```
-  
+```{r}
 
+```
 
