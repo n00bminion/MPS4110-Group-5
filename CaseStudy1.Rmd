@@ -1,7 +1,7 @@
 ---
-title: "Case Study 1"
-author: "Zain Naseer/Kevin Stone/Minh Tran"
-date: "2025-11-01"
+title: Case Study 1
+date: 2025-11-01
+author: Group 5 - Zain Naseer, Kevin Stone and Minh Tran
 output:
   html_document: default
   pdf_document: default
@@ -23,33 +23,43 @@ knitr::opts_chunk$set(fig.align = "left")
 library(tidyverse)
 library(knitr)
 library(ggplot2)
-library(ggside)
 
-univ <- read_csv("data/universities.csv")
+for (year in 2017:2024) {
+  write_csv(
+    read_csv(
+      paste0(
+        "https://gender-pay-gap.service.gov.uk/viewing/download-data/", year
+      )
+    ),
+    paste0("UK Gender Pay Gap Data - ", year, " to ", year + 1, ".csv")
+  )
+}
+
+univ <- read_csv("universities.csv")
 head(univ)
 
-pay1 <- read_csv("data/UK Gender Pay Gap Data 2017.csv")
+pay1 <- read_csv("UK Gender Pay Gap Data - 2017 to 2018.csv")
 head(pay1)
 
-pay2 <- read_csv("data/UK Gender Pay Gap Data 2018.csv")
+pay2 <- read_csv("UK Gender Pay Gap Data - 2018 to 2019.csv")
 head(pay2)
 
-pay3 <- read_csv("data/UK Gender Pay Gap Data 2019.csv")
+pay3 <- read_csv("UK Gender Pay Gap Data - 2019 to 2020.csv")
 head(pay3)
 
-pay4 <- read_csv("data/UK Gender Pay Gap Data 2020.csv")
+pay4 <- read_csv("UK Gender Pay Gap Data - 2020 to 2021.csv")
 head(pay4)
 
-pay5 <- read_csv("data/UK Gender Pay Gap Data 2021.csv")
+pay5 <- read_csv("UK Gender Pay Gap Data - 2021 to 2022.csv")
 head(pay5)
 
-pay6 <- read_csv("data/UK Gender Pay Gap Data 2022.csv")
+pay6 <- read_csv("UK Gender Pay Gap Data - 2022 to 2023.csv")
 head(pay6)
 
-pay7 <- read_csv("data/UK Gender Pay Gap Data 2023.csv")
+pay7 <- read_csv("UK Gender Pay Gap Data - 2023 to 2024.csv")
 head(pay7)
 
-pay8 <- read_csv("data/UK Gender Pay Gap Data 2024.csv")
+pay8 <- read_csv("UK Gender Pay Gap Data - 2024 to 2025.csv")
 head(pay8)
 
 df <- rbind(pay1, pay2, pay3, pay4, pay5, pay6, pay7, pay8)
@@ -87,7 +97,9 @@ df1$DiffMeanBonusPercent[is.na(df1$DiffMeanBonusPercent)] <- 0
 df1$DiffMedianBonusPercent[is.na(df1$DiffMedianBonusPercent)] <- 0
 ```
 
-### Table 1
+**Note**: A positive percentage means men’s hourly pay is higher than women’s. A negative percentage means women’s pay is higher
+
+### Percentage Difference of Hourly Pay By Year
 
 ```{r,include=TRUE}
 df1 %>%
@@ -101,13 +113,11 @@ df1 %>%
   kable()
 ```
 
-**Note**: A positive percentage means men’s hourly pay is higher than women’s. A negative percentage means women’s pay is higher
-
 The gap between the median percentage differences between the hourly pay of men and women is decreasing with time, as can be seen from the mean of the median percentage differences column. 
 
 Also, the median percentage differences reported by universities are showcasing a decreasing variation with time, as can be seen from the standard deviation of the median percentage differences column.
 
-### Table 2
+### Percentage Difference of Hourly Pay By Year & Institution Type
 
 ```{r,include=TRUE}
 df1 %>%
@@ -127,8 +137,6 @@ df1 %>%
   ) %>%
   kable()
 ```
-
-**Note**: A positive percentage means men’s hourly pay is higher than women’s. A negative percentage means women’s pay is higher
 
 For every reported year, the mean of the 'median percentage differences for hourly pay' is greater for Pre 1992 institutions compared with Post 1992 institutions. Therefore, it can be concluded from the data that Pre 1992 institutions have a greater disparity in pay compared with Post 1992 institutions. In other words male employees are paid more than female employees. 
 
@@ -170,31 +178,50 @@ glimpse(df1Long)
 
 ### Median Hour Pay & Median Bonus Pay Between Men and Women
 
-As mentioned above, any positive percentage difference means men’s pay is higher than women’s and vice versa. If we set men pay to £1, we can thus use the median percentage differences to calculate how much women are underpaid/overpaid in comparison for each £1 men are being paid for. Applying this to both hourly pay and bonus pay, we can see see the a relationship between the two pay types. 
+As mentioned above, any positive percentage difference means men’s pay is higher than women’s and negative percentage means women’s pay is higher. If we set men pay to £1, we can thus use the median percentage differences to calculate how much women are underpaid/overpaid in comparison for each £1 men are being paid for. Applying this to both hourly pay and bonus pay, we can see see the relationship between the two pay types.
 
-First observation follows on the main points from table above, where we see a large number of data points clustered in the top right quadrant, indicating that men are generally paid more than women on both hourly basis and in term of bonus.
+First observation follows on the main points from table above, where we see a large number of data points clustered in the top right quadrant, indicating that men are generally paid more than women on both hourly basis and in terms of bonus.
 
-However, there are also a large number of women earning more bonuses than men, which is shown in the top right quadrant but the density is lower than top left quadrant. Interestingly, the women earn a signigficantly larger bonuses than men while still being paid less on an hourly basis.
+However, there are instances where women are being paid a higher amount of bonuses than men, which is shown by the data points in the top left quadrant. This is an interesting observation as it shows that some institutions might be trying to bridge the pay gap by giving women higher bonuses.
 
-Lastly, the bottom two quadrants show very few data points further support the point that women do not earn as men hourly.
+Lastly, the bottom two quadrants show very few data points which further support the point that women do not earn as much as men hourly.
 
-Slicing the data by Years does not yield any meaningful results but splitting the data by Pre 1992 and Post 1992 institutions shows that the Post 1992 institutions have a wide spread of bonus pay differences compare to Pre 1992 institutions. 
 
 ``` {r, fig.height =11, fig.width = 13, include= TRUE}
 data <- df1
 
 x_limit <- 4
-y_limit <- 4
+y_limit <- 1
 
 ggplot(
   data = data,
-  aes(x = DiffMedianBonusPercent / 100, y = DiffMedianHourlyPercent / 100, colour = as.factor(pre92))
+  aes(
+    x = DiffMedianBonusPercent / 100,
+    y = DiffMedianHourlyPercent / 100,
+    colour = as.factor(pre92)
+  )
 ) +
   geom_point() +
   xlim(-x_limit, x_limit) +
   ylim(-y_limit, y_limit) +
-  annotate("rect", xmin = 0, xmax = -x_limit, ymin = 0, ymax = -x_limit, alpha = 0.2, fill = "red") +
-  annotate("rect", xmin = 0, xmax = x_limit, ymin = 0, ymax = x_limit, alpha = 0.2, fill = "red") +
+  annotate(
+    "rect",
+    xmin = 0,
+    xmax = -x_limit,
+    ymin = 0,
+    ymax = -y_limit,
+    alpha = 0.2,
+    fill = "red"
+  ) +
+  annotate(
+    "rect",
+    xmin = 0,
+    xmax = x_limit,
+    ymin = 0,
+    ymax = y_limit,
+    alpha = 0.2,
+    fill = "red"
+  ) +
   annotate(
     "text",
     label = paste("Men earning more, both hourly & bonus"),
@@ -228,33 +255,20 @@ ggplot(
     size = 4.5
   ) +
   labs(y = "Hourly Pay", x = "Bonus Pay", colour = "Pre 92 Institution") +
-  geom_xsideboxplot(
-    aes(x = DiffMedianBonusPercent / 100, fill = as.factor(pre92)),
-    orientation = "y",
-    alpha = 0.5,
-    outlier.shape = NA,
-    show.legend = FALSE,
-  ) +
-  geom_ysideboxplot(
-    aes(y = DiffMedianHourlyPercent / 100, fill = as.factor(pre92)),
-    alpha = 0.5,
-    outlier.shape = NA,
-    orientation = "x",
-    show.legend = FALSE
-  ) +
   theme(
     axis.title.y = element_text(angle = 0, vjust = 0.5),
-    ggside.panel.scale.x = 0.15,
-    ggside.panel.scale.y = 0.15,
-    ggside.axis.ticks.x = element_blank(),
-    ggside.axis.ticks.y = element_blank(),
-    ggside.axis.text.x = element_blank(),
-    ggside.axis.text.y = element_blank()
   )
 ```
 
 
 ### Pay Gap Within Each Pay Quartile for Each Year
+
+Apart from the Top Quartile, the other pay quartiles have a higher female representation. The percentage of male and female in the top hourly pay quartile (highest paid) has seen a pay gap reduction since 2018, with it being at its lowest in 2025. In 2025 we have a median value of 52% for male representation in the Top Quartile, compared with a median of 48% for female representation. 
+
+It can be seen that for the Top Quartile the box plots converge with each passing year. This shows that the pay gap is closing for the Top Quartile. The Lower Quartile and Lower Middle Quartile in general show a static picture over the years. 
+
+A point of interest is that the Upper Middle Quartile box plots are diverging with each passing year, which enlightens us to a widening pay gap in this specific quartile in favour of females.
+
 
 ```{r, fig.height = 10, fig.width = 12, include= TRUE}
 df1Long %>%
@@ -282,15 +296,10 @@ df1Long %>%
   ) +
   facet_wrap(~Quartiles) +
   labs(
-    x = "Percentage (%)",
+    x = "Proportion of employees in pay quartile (%)",
     y = ""
   )
 ```
-
-The percentage of male and female in the top hourly pay quartile (highest paid) has seen a pay gap reduction since 2018, with it being at its lowest in 2025. In 2025 we have a median value of 52% for male representation in the Top Quartile, compared with a median of 48% for female representation. 
-
-Apart from the Top Quartile, the other pay quartiles have a higher female representation. 
-
 
 ### Conclusion
 
